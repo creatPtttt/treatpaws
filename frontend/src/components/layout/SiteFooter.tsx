@@ -1,6 +1,7 @@
 import { Footer } from 'animal-island-ui';
 import { Twitter, Send, MessageCircle } from 'lucide-react';
 import { PROGRAM_ID, TREAT_MINT, explorerUrl } from '../../data/chain';
+import { CREATURES } from '../../data/creatures';
 import { shortenAddress } from '../../wallet/format';
 
 // Placeholder community links — swap hrefs once real accounts/servers exist.
@@ -44,6 +45,18 @@ export function SiteFooter() {
             $TREAT Mint: {shortenAddress(TREAT_MINT, 6)}
           </a>
         </div>
+
+        <p className="site-footer__credits">
+          Genesis pet art from the{' '}
+          <a href="https://petdex.dev" target="_blank" rel="noreferrer noopener">
+            petdex.dev
+          </a>{' '}
+          community gallery —{' '}
+          {Object.values(CREATURES)
+            .map((creature) => `${creature.displayName} by ${creature.author}`)
+            .join(', ')}
+          .
+        </p>
       </div>
 
       {/* animal-island-ui's own copyright bar component */}

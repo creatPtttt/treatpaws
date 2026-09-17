@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Program } from '@coral-xyz/anchor';
 import { getAllPetPdas } from '../anchor/pda';
 import { toPetView, type PetRaw, type PetView } from '../anchor/types';
@@ -7,10 +7,13 @@ import { extractErrorMessage } from '../anchor/errors';
 const REFRESH_INTERVAL_MS = 15_000;
 
 interface UsePetsResult {
-  /** null while loading OR when the game has never been initialized on-chain. */
+  /** null until the very first successful fetch resolves. */
   pets: PetView[] | null;
   notInitialized: boolean;
+  /** true only for the very first fetch — drives full-page skeleton UI. */
   loading: boolean;
+  /** true while a silent background poll is in flight after the first load. */
+  isRefetching: boolean;
   error: string | null;
   refetch: () => Promise<void>;
 }
@@ -20,14 +23,25 @@ export function usePets(program: Program | null): UsePetsResult {
   const [pets, setPets] = useState<PetView[] | null>(null);
   const [notInitialized, setNotInitialized] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [isRefetching, setIsRefetching] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Tracks whether we've completed at least one fetch — flips `loading`
+  // off for good so periodic polling never re-triggers the skeleton UI and
+  // unmounts already-rendered pet cards.
+  const hasLoadedOnceRef = useRef(false);
 
   const refetch = useCallback(async () => {
     if (!program) {
       setLoading(false);
       return;
     }
-    setLoading(true);
+
+    if (hasLoadedOnceRef.current) {
+      setIsRefetching(true);
+    } else {
+      setLoading(true);
+    }
+
     try {
       const petPdas = getAllPetPdas();
       // fetchMultiple batches into one getMultipleAccountsInfo call and
@@ -45,9 +59,13 @@ export function usePets(program: Program | null): UsePetsResult {
       }
       setError(null);
     } catch (err) {
+      // Keep whatever pets we already have on screen — a transient RPC
+      // hiccup during a background poll shouldn't blank out live data.
       setError(extractErrorMessage(err));
     } finally {
+      hasLoadedOnceRef.current = true;
       setLoading(false);
+      setIsRefetching(false);
     }
   }, [program]);
 
@@ -57,5 +75,5 @@ export function usePets(program: Program | null): UsePetsResult {
     return () => clearInterval(interval);
   }, [refetch]);
 
-  return { pets, notInitialized, loading, error, refetch };
+  return { pets, notInitialized, loading, isRefetching, error, refetch };
 }

@@ -11,6 +11,10 @@ import { PROGRAM_PUBKEY } from './pda';
  * (see the RequireWallet / RequireAdmin route guards).
  */
 export function useProgram(): Program | null {
+  // `connection` comes from `WalletContextProvider`'s `<ConnectionProvider>`,
+  // which is already pointed at `VITE_SOLANA_RPC_URL` (see `config/env.ts`)
+  // — every instruction sent through this Anchor `Program` therefore goes
+  // through the same dedicated RPC as the rest of the app.
   const { connection } = useConnection();
   // useAnchorWallet() adapts the wallet-adapter wallet into the
   // { publicKey, signTransaction, signAllTransactions } shape Anchor expects.

@@ -1,5 +1,5 @@
-import { BN, type Program } from '@coral-xyz/anchor';
-import { ComputeBudgetProgram, PublicKey, SystemProgram, SYSVAR_RENT_PUBKEY } from '@solana/web3.js';
+import { AnchorProvider, BN, type Program } from '@coral-xyz/anchor';
+import { ComputeBudgetProgram, PublicKey, SystemProgram, SYSVAR_RENT_PUBKEY, Transaction } from '@solana/web3.js';
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   TOKEN_PROGRAM_ID,
@@ -177,6 +177,50 @@ export async function claimCoins(program: Program, owner: PublicKey, petId: numb
       systemProgram: SystemProgram.programId,
     })
     .rpc();
+}
+
+/**
+ * Batches `claim_coins` for every pet id in `petIds` into ONE transaction so
+ * the owner signs (and pays network fees) once instead of once per pet —
+ * "Harvest All Treats" in My Sanctuary. All claimed pets share the same
+ * owner/gameConfig/vault/ownerAta accounts, so only `pet` differs per
+ * instruction; well within the ~1232-byte tx size limit for up to 10 pets.
+ */
+export async function claimAllCoins(program: Program, owner: PublicKey, petIds: number[]): Promise<string> {
+  if (petIds.length === 0) {
+    throw new Error('No pets to harvest — nothing owned yet.');
+  }
+
+  const [gameConfig] = getGameConfigPda();
+  const [vault] = getVaultPda();
+  const ownerAta = getAssociatedTokenAddressSync(REWARD_MINT, owner);
+  const ensureAta = createAssociatedTokenAccountIdempotentInstruction(owner, ownerAta, owner, REWARD_MINT);
+
+  const claimInstructions = await Promise.all(
+    petIds.map((petId) => {
+      const [pet] = getPetPda(petId);
+      return program.methods
+        .claimCoins(petId)
+        .accounts({
+          owner,
+          gameConfig,
+          rewardMint: REWARD_MINT,
+          pet,
+          ownerAta,
+          vault,
+          tokenProgram: TOKEN_PROGRAM_ID,
+          associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+          systemProgram: SystemProgram.programId,
+        })
+        .instruction();
+    }),
+  );
+
+  const transaction = new Transaction().add(ensureAta, ...claimInstructions);
+  // useProgram() always constructs an AnchorProvider, so this cast is safe —
+  // it's the only Provider implementation ever handed to `new Program(...)`.
+  const provider = program.provider as AnchorProvider;
+  return provider.sendAndConfirm(transaction);
 }
 
 /** Owner feeds a pet (sinks feed_cost $TREAT) to extend its Snack Boost 24h. */

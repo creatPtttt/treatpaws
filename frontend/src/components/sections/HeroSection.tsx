@@ -1,19 +1,16 @@
 import { Card, Button } from 'animal-island-ui';
-import { PixelPet } from '../ui/PixelPet';
+import { PetSprite } from '../ui/PetSprite';
+import { getCreature } from '../../data/creatures';
 import { useEnterGame } from '../../hooks/useEnterGame';
 
-// Bounce colors for the playpen preview — matches the Genesis Pets palette.
-const PLAYPEN_PETS = [
-  { color: '#F8A6B2', delay: 0 },
-  { color: '#82D5BB', delay: 0.15 },
-  { color: '#F7CD67', delay: 0.3 },
-  { color: '#889DF0', delay: 0.45 },
-];
+// A representative sample of 4 of the 10 real genesis pets (see
+// src/data/creatures.ts), bouncing in the hero playpen preview.
+const PREVIEW_PET_IDS = [1, 6, 9, 10];
 
 /**
  * Above-the-fold hero: headline + subtitle on the left, an animal-island-ui
- * <Card> "playpen" showing bouncing pixel companion placeholders on the
- * right, plus the two primary call-to-action buttons.
+ * <Card> "playpen" showing a few of the real animated genesis companion
+ * pets idling, plus the two primary call-to-action buttons.
  */
 export function HeroSection() {
   // Same connect-then-navigate flow as the header's "Enter TreatPaws" CTA.
@@ -37,11 +34,11 @@ export function HeroSection() {
         </div>
       </div>
 
-      {/* Central "playpen" — a parchment Card housing a few bouncing pet placeholders */}
+      {/* Central "playpen" — a parchment Card housing a few of the real animated genesis pets */}
       <Card className="hero__playpen" color="app-yellow" pattern="app-teal">
         <div className="hero__playpen-inner">
-          {PLAYPEN_PETS.map((pet, index) => (
-            <PixelPet key={index} color={pet.color} delay={pet.delay} size={72} />
+          {PREVIEW_PET_IDS.map((petId) => (
+            <PetSprite key={petId} creature={getCreature(petId)} size={72} />
           ))}
         </div>
         <p className="hero__playpen-caption">Genesis companions, idling away in the playpen</p>

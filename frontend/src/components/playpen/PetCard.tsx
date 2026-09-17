@@ -7,6 +7,8 @@ import type { GameConfigView, PetView } from '../../anchor/types';
 import { useLiveRewards } from '../../hooks/useLiveRewards';
 import { shortenAddress } from '../../wallet/format';
 import { formatDuration } from '../../utils/time';
+import { PetSprite } from '../ui/PetSprite';
+import { getCreature } from '../../data/creatures';
 import { FeedConfirmModal } from './FeedConfirmModal';
 import { RenameModal } from './RenameModal';
 
@@ -16,6 +18,8 @@ interface PetCardProps {
   currentUser: PublicKey | null;
   /** Key of whichever action is currently mid-flight, e.g. "claim-3". */
   pendingKey: string | null;
+  /** Extra busy flag independent of `pendingKey` — e.g. My Sanctuary's "Harvest All" is claiming this pet as part of a batch. */
+  forceBusy?: boolean;
   onBuy: (pet: PetView) => void;
   onClaim: (pet: PetView) => void;
   onFeed: (pet: PetView) => void;
@@ -23,15 +27,26 @@ interface PetCardProps {
 }
 
 /** One genesis pet's live on-chain state + player actions. */
-export function PetCard({ pet, gameConfig, currentUser, pendingKey, onBuy, onClaim, onFeed, onRename }: PetCardProps) {
+export function PetCard({
+  pet,
+  gameConfig,
+  currentUser,
+  pendingKey,
+  forceBusy = false,
+  onBuy,
+  onClaim,
+  onFeed,
+  onRename,
+}: PetCardProps) {
   const { pending, boosted, boostRemainingSeconds } = useLiveRewards(pet, gameConfig);
   const [feedOpen, setFeedOpen] = useState(false);
   const [renameOpen, setRenameOpen] = useState(false);
 
   const isMine = currentUser !== null && currentUser.toBase58() === pet.owner;
   const priceSol = pet.currentPriceLamports / LAMPORTS_PER_SOL;
-  // Disable every button on this card while ANY action for this pet id is in flight.
-  const cardBusy = pendingKey?.endsWith(`-${pet.id}`) ?? false;
+  // Disable every button on this card while ANY action for this pet id is
+  // in flight, OR while a caller-driven batch action (Harvest All) covers it.
+  const cardBusy = (pendingKey?.endsWith(`-${pet.id}`) ?? false) || forceBusy;
 
   return (
     <Card hoverable className={cn('pet-card', isMine && 'pet-card--mine')}>
@@ -42,6 +57,10 @@ export function PetCard({ pet, gameConfig, currentUser, pendingKey, onBuy, onCla
             Mine
           </Tag>
         )}
+      </div>
+
+      <div className="pet-card__avatar-wrap">
+        <PetSprite creature={getCreature(pet.id)} size={72} />
       </div>
 
       <h3 className="pet-card__name">{pet.name}</h3>
