@@ -4,8 +4,10 @@ import { useProgram } from '../anchor/useProgram';
 import { useGameConfig } from '../hooks/useGameConfig';
 import { useMintDecimals } from '../hooks/useMintDecimals';
 import { useTransactionRunner } from '../hooks/useTransactionRunner';
+import { useVaultBalance } from '../hooks/useVaultBalance';
 import { InitializeGameCard } from '../components/admin/InitializeGameCard';
 import { DepositVaultCard } from '../components/admin/DepositVaultCard';
+import { WithdrawVaultCard } from '../components/admin/WithdrawVaultCard';
 import { UpdateConfigCard } from '../components/admin/UpdateConfigCard';
 
 /**
@@ -19,7 +21,15 @@ export function AdminPage() {
   const { publicKey } = useWallet();
   const { gameConfig, notInitialized, loading, refetch } = useGameConfig(program);
   const { decimals, loaded: decimalsLoaded } = useMintDecimals(connection);
+  const { uiAmount: vaultUiAmount, uiAmountString: vaultUiAmountString, loaded: vaultLoaded, refetch: refetchVault } =
+    useVaultBalance(connection);
   const { pendingKey, run } = useTransactionRunner();
+
+  // Refresh both GameConfig and the Vault token balance after any admin tx.
+  const handleSuccess = () => {
+    void refetch();
+    void refetchVault();
+  };
 
   return (
     <section className="section admin-page">
@@ -38,7 +48,7 @@ export function AdminPage() {
           checking={loading}
           pendingKey={pendingKey}
           run={run}
-          onSuccess={refetch}
+          onSuccess={handleSuccess}
         />
 
         <DepositVaultCard
@@ -48,7 +58,20 @@ export function AdminPage() {
           decimalsLoaded={decimalsLoaded}
           pendingKey={pendingKey}
           run={run}
-          onSuccess={refetch}
+          onSuccess={handleSuccess}
+        />
+
+        <WithdrawVaultCard
+          program={program}
+          publicKey={publicKey}
+          decimals={decimals}
+          decimalsLoaded={decimalsLoaded}
+          vaultUiAmount={vaultUiAmount}
+          vaultUiAmountString={vaultUiAmountString}
+          vaultLoaded={vaultLoaded}
+          pendingKey={pendingKey}
+          run={run}
+          onSuccess={handleSuccess}
         />
 
         <UpdateConfigCard
@@ -57,7 +80,7 @@ export function AdminPage() {
           gameConfig={gameConfig}
           pendingKey={pendingKey}
           run={run}
-          onSuccess={refetch}
+          onSuccess={handleSuccess}
         />
       </div>
     </section>

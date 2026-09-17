@@ -17,7 +17,7 @@ document and in `lib.rs`. They are the same program; only the marketing name dif
 See [`frontend/README.md`](./frontend/README.md) for setup and page-structure notes. It's
 a full client, not just a landing page: `/` is the marketing home, `/playpen` is the live
 on-chain game hall (buy/claim/feed/rename + Hall of Fame leaderboard), and `/admin` is a
-hidden console (initialize, deposit to vault, tune the economy) gated by
+hidden console (initialize, deposit to vault, withdraw from vault, tune the economy) gated by
 `VITE_ADMIN_PUBKEY`.
 
 ---

@@ -69,7 +69,7 @@ table in `src/App.tsx`). The header/footer stay mounted across every route; only
 | --- | --- | --- | --- |
 | `/` | `src/pages/LandingPage.tsx` | none (public) | Marketing home page — hero, stats, how-it-works, pet showcase, yield calculator, FAQ. |
 | `/playpen` | `src/pages/PlaypenPage.tsx` | `RequireWallet` | The live game hall — three tabs: **All Pets**, **My Sanctuary** (owned pets + batched harvest), **Hall of Fame**. |
-| `/admin` | `src/pages/AdminPage.tsx` | `RequireAdmin` | Hidden management console (initialize / deposit / tune economy). Never linked from the nav. |
+| `/admin` | `src/pages/AdminPage.tsx` | `RequireAdmin` | Hidden management console (initialize / deposit / withdraw / tune economy). Never linked from the nav. |
 
 Clicking **"Enter TreatPaws"** (header) or **"Adopt Genesis Pet"** (hero) runs
 `useEnterGame()` (`src/hooks/useEnterGame.ts`): if a wallet is already connected it
@@ -87,11 +87,12 @@ auto-navigates the instant a connection succeeds.
 | PDA derivation (`game_config`, `vault`, `pet #N`) | `src/anchor/pda.ts` |
 | Anchor `Program` client bound to the connected wallet | `src/anchor/useProgram.ts` |
 | Raw ↔ UI view-model conversion for `GameConfig` / `Pet` | `src/anchor/types.ts` |
-| Instruction builders (`initializeGame`, `depositVault`, `updateGameConfig`, `buyPet`, `claimCoins`, `claimAllCoins`, `feedPet`, `renamePet`) | `src/anchor/instructions.ts` |
+| Instruction builders (`initializeGame`, `depositVault`, `withdrawVault`, `updateGameConfig`, `buyPet`, `claimCoins`, `claimAllCoins`, `feedPet`, `renamePet`) | `src/anchor/instructions.ts` |
 | Friendly on-chain error messages | `src/anchor/errors.ts` |
 | Data hooks (poll `GameConfig` / all 10 `Pet` PDAs, detect "not initialized") | `src/hooks/useGameConfig.ts`, `src/hooks/usePets.ts` |
 | Live per-second reward ticker — single pet / summed across many | `src/hooks/useLiveRewards.ts`, `src/hooks/useAggregateRewards.ts` (both share the pure formula in `src/utils/rewards.ts`, mirroring `calculate_pending_rewards` from `lib.rs`) |
 | $TREAT mint decimals (for whole-token ↔ raw u64 conversion) | `src/hooks/useMintDecimals.ts` |
+| Vault PDA $TREAT remaining (for admin Max withdraw) | `src/hooks/useVaultBalance.ts` |
 | Toast + per-action loading state around every `.rpc()` call | `src/hooks/useTransactionRunner.ts` |
 | Zero-HTTP-polling live buyout detection via `connection.onLogs` | `src/hooks/useProgramEvents.ts` |
 | Offline "welcome back" buyout detection (localStorage snapshot diff) | `src/hooks/useOfflineTakeoverDetection.ts` |
@@ -161,7 +162,7 @@ or upgrade the anchor package together with `useProgram.ts`'s `new Program(...)`
 
 ### `/admin` — hidden management console
 
-Three cards, each a separate component under `src/components/admin/`:
+Four cards, each a separate component under `src/components/admin/`:
 
 1. **`InitializeGameCard`** — one-click `initialize_game` at 0.01 SOL per pet, with a
    `ComputeBudgetProgram.setComputeUnitLimit({ units: 400_000 })` instruction prepended
@@ -169,7 +170,12 @@ Three cards, each a separate component under `src/components/admin/`:
    Disabled automatically once `GameConfig` already exists on-chain.
 2. **`DepositVaultCard`** — deposits an admin-entered whole-$TREAT amount into the Vault
    PDA, creating the admin's ATA idempotently first if needed.
-3. **`UpdateConfigCard`** — patches any subset of `fee_basis_points`,
+3. **`WithdrawVaultCard`** — emergency `withdraw_vault` of an admin-entered whole-$TREAT
+   amount from the Vault PDA back to the admin ATA. A **Max** button fills the input with
+   the live vault remaining balance (`useVaultBalance`); the danger button opens a
+   confirmation modal before asking the wallet to sign. A success toast plus a
+   `canvas-confetti` burst fire on confirmation.
+4. **`UpdateConfigCard`** — patches any subset of `fee_basis_points`,
    `price_increment_bps`, `base_reward_rate`, `boost_reward_rate`, `feed_cost`,
    `rename_cost` via `update_game_config`. Blank fields are sent as `null` (unchanged);
    current on-chain values are shown next to each label.
@@ -289,8 +295,5 @@ author (or commission original art) to avoid IP issues.** This is fine for a Dev
 
 1. **Live activity ticker** (`src/data/activity.ts`) is still mock data — hook it up to
    program log subscriptions or an off-chain indexer if you want real events.
-2. **Withdraw from vault** — the program supports `withdraw_vault` (see `lib.rs` /
-   `src/anchor/instructions.ts` has no builder for it yet) but no admin UI button was
-   requested; add one the same way as `DepositVaultCard` if needed.
-3. Update `src/data/chain.ts` (`PROGRAM_ID`, `TREAT_MINT`) and the RPC cluster in
+2. Update `src/data/chain.ts` (`PROGRAM_ID`, `TREAT_MINT`) and the RPC cluster in
    `WalletContextProvider.tsx` when moving from Devnet to Mainnet.

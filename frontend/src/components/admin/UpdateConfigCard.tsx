@@ -52,7 +52,7 @@ const FIELDS: { key: FieldKey; label: string; currentValue: (config: GameConfigV
 
 const ACTION_KEY = 'update-config';
 
-/** Admin card #3: patch any subset of GameConfig's tunable economy knobs. */
+/** Admin card #4: patch any subset of GameConfig's tunable economy knobs. */
 export function UpdateConfigCard({
   program,
   publicKey,
@@ -91,7 +91,7 @@ export function UpdateConfigCard({
 
   return (
     <Card className="admin-card">
-      <h3 className="admin-card__title">3. Update Game Config Knobs</h3>
+      <h3 className="admin-card__title">4. Update Game Config Knobs</h3>
       <p className="admin-card__description">
         Leave a field blank to keep its current on-chain value — only the fields you fill in are
         sent to <code>update_game_config</code>.

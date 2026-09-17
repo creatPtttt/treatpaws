@@ -92,6 +92,47 @@ export async function depositVault(
     .rpc();
 }
 
+/**
+ * Admin-only: emergency pull of `amount` whole $TREAT from the Vault PDA
+ * back to the admin's Associated Token Account. `mintDecimals` scales the
+ * UI amount to the raw u64 the program's `withdraw_vault` instruction expects.
+ */
+export async function withdrawVault(
+  program: Program,
+  adminWallet: PublicKey,
+  amount: number,
+  mintDecimals: number,
+): Promise<string> {
+  const [gameConfig] = getGameConfigPda();
+  const [vault] = getVaultPda();
+  const adminAta = getAssociatedTokenAddressSync(REWARD_MINT, adminWallet);
+  // Whole $TREAT -> raw u64 using the mint's actual decimals.
+  const amountRaw = Math.round(amount * 10 ** mintDecimals);
+
+  // The program's WithdrawVault accounts do not `init_if_needed` the
+  // admin's ATA, so create it client-side first (idempotent = no-op if
+  // it already exists). The admin pays rent if a new ATA is created.
+  const ensureAta = createAssociatedTokenAccountIdempotentInstruction(
+    adminWallet,
+    adminAta,
+    adminWallet,
+    REWARD_MINT,
+  );
+
+  return program.methods
+    .withdrawVault(new BN(amountRaw))
+    .accounts({
+      admin: adminWallet,
+      gameConfig,
+      rewardMint: REWARD_MINT,
+      adminAta,
+      vault,
+      tokenProgram: TOKEN_PROGRAM_ID,
+    })
+    .preInstructions([ensureAta])
+    .rpc();
+}
+
 export interface GameConfigPatch {
   feeBasisPoints: number | null;
   priceIncrementBps: number | null;

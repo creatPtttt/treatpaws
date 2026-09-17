@@ -1555,6 +1555,17 @@ body {
   font-style: normal;
 }
 
+.admin-card__vault-balance {
+  font-size: 13px;
+  font-weight: 700;
+  margin: 0;
+  color: var(--animal-text-color, #725d42);
+}
+
+.admin-card__vault-balance-value {
+  color: var(--animal-primary-color, #19c8b9);
+}
+
 /* =========================================================================
    404
    ========================================================================= */
