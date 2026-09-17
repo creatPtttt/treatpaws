@@ -3,6 +3,7 @@ import { LAMPORTS_PER_SOL, type PublicKey } from '@solana/web3.js';
 import { Coins, PawPrint, Wallet } from 'lucide-react';
 import type { GameConfigView, PetView } from '../../anchor/types';
 import { useAggregateRewards } from '../../hooks/useAggregateRewards';
+import { ShareOnXButton } from '../ui/ShareOnXButton';
 import { PetCard } from './PetCard';
 
 interface MySanctuaryProps {
@@ -77,17 +78,22 @@ export function MySanctuary({
         </Card>
       </div>
 
-      <Button
-        type="primary"
-        size="large"
-        block
-        className="sanctuary__harvest-button"
-        loading={harvestBusy}
-        disabled={pendingKey !== null || totalUnclaimed <= 0}
-        onClick={onHarvestAll}
-      >
-        Harvest All Treats {totalUnclaimed > 0 ? `(+${totalUnclaimed.toFixed(2)})` : ''}
-      </Button>
+      <div className="sanctuary__actions">
+        <Button
+          type="primary"
+          size="large"
+          block
+          className="sanctuary__harvest-button"
+          loading={harvestBusy}
+          disabled={pendingKey !== null || totalUnclaimed <= 0}
+          onClick={onHarvestAll}
+        >
+          Harvest All Treats {totalUnclaimed > 0 ? `(+${totalUnclaimed.toFixed(2)})` : ''}
+        </Button>
+        {/* One shared "Share on X" for the whole sanctuary, replacing what
+            used to be a button repeated on every single owned pet card. */}
+        <ShareOnXButton size="middle" block className="sanctuary__share-button" />
+      </div>
 
       <div className="pet-grid">
         {ownedPets.map((pet) => (

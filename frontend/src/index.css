@@ -412,11 +412,38 @@ body {
    Genesis pets showcase
    ------------------------------------------------------------------------- */
 
+/* Mobile-first breakpoints matching `.pet-grid` above — see that comment
+   for why explicit column counts replace an auto-fill/auto-fit approach. */
 .pets-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 18px;
+  grid-template-columns: 1fr;
+  gap: 16px;
   margin-top: 24px;
+}
+
+@media (min-width: 640px) {
+  .pets-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 768px) {
+  .pets-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .pets-grid {
+    gap: 24px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .pets-grid {
+    /* Exactly 2 full rows of 5 for the 10 genesis pets. */
+    grid-template-columns: repeat(5, 1fr);
+  }
 }
 
 .pets-grid__card {
@@ -426,6 +453,10 @@ body {
   gap: 6px;
   padding: 22px 14px;
   text-align: center;
+  /* Same CSS Grid `min-width: auto` fix as `.pet-card` — keeps every
+     column shrinking evenly to its `1fr` share instead of being dictated
+     by whichever card has the widest owner address. */
+  min-width: 0;
 }
 
 .pets-grid__avatar-wrap {
@@ -725,10 +756,6 @@ body {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  .pets-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-
   .calculator__card {
     grid-template-columns: 1fr;
   }
@@ -753,10 +780,6 @@ body {
 @media (max-width: 600px) {
   .vault-stats__grid {
     grid-template-columns: 1fr 1fr;
-  }
-
-  .pets-grid {
-    grid-template-columns: repeat(2, 1fr);
   }
 
   .site-header__cta {
@@ -806,6 +829,18 @@ body {
    /playpen — Live Pet Playpen
    ========================================================================= */
 
+.playpen-page {
+  /* The shared `.section` cap (1120px) was designed for the landing page's
+     narrow, centered reading column — fine for a headline, but it squeezed
+     the 5-column pet grid down to ~195px cards on common desktop widths
+     (1280–1440px), noticeably narrower than the old grid's cards. This
+     dashboard-style page gets more breathing room instead; still capped
+     so the grid doesn't stretch absurdly wide on ultra-wide monitors.
+     Card width is otherwise unaffected below 1120px viewports — the cap
+     only ever shrinks to fit the viewport, never grows past it. */
+  max-width: 1440px;
+}
+
 .playpen-page__heading {
   display: flex;
   align-items: center;
@@ -843,16 +878,49 @@ body {
   gap: 14px;
 }
 
-.playpen-page__skeleton-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-  gap: 20px;
-}
-
+/*
+ * Mobile-first, explicit column-count breakpoints (rather than the old
+ * `repeat(auto-fill, minmax(230px, 1fr))`) so the 10 genesis pets always
+ * land in tidy, fully-packed rows. `auto-fill` just squeezes in as many
+ * 230px-min columns as fit the container — on typical desktop widths that
+ * happened to be 4, producing an awkward "4 + 4 + 2 lonely stragglers"
+ * final row. Forcing exactly 5 columns from the `xl` breakpoint up gives a
+ * perfect 5x2 grid instead.
+ */
+.playpen-page__skeleton-grid,
 .pet-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-  gap: 20px;
+  grid-template-columns: 1fr; /* mobile: one comfortable full-width card per row */
+  gap: 16px;
+}
+
+@media (min-width: 640px) {
+  .playpen-page__skeleton-grid,
+  .pet-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 768px) {
+  .playpen-page__skeleton-grid,
+  .pet-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .playpen-page__skeleton-grid,
+  .pet-grid {
+    gap: 24px; /* column count unchanged from md (3) — only the gap grows */
+  }
+}
+
+@media (min-width: 1280px) {
+  .playpen-page__skeleton-grid,
+  .pet-grid {
+    /* Exactly 2 full rows of 5 for the 10 genesis pets. */
+    grid-template-columns: repeat(5, 1fr);
+  }
 }
 
 .pet-card {
@@ -860,6 +928,15 @@ body {
   flex-direction: column;
   gap: 10px;
   padding: 22px;
+  /* CSS Grid items default to `min-width: auto`, meaning a track can never
+     shrink below its widest child's *unwrapped* content size. The boost
+     status tag below ("Boosted 120/10m · 43h 41m left" vs. a short
+     "Regular 100/10m") is `white-space: nowrap` by default, so without this
+     override a boosted pet's column got silently forced wider than the
+     others — uneven card widths, and the whole 5-column grid overflowing
+     its container (clipping the last column). Pairs with the wrap override
+     on `.pet-card__status-tag` below so the tag's own text never clips. */
+  min-width: 0;
 }
 
 .pet-card--mine {
@@ -928,6 +1005,17 @@ body {
   align-items: center;
   gap: 6px;
   width: fit-content;
+  max-width: 100%;
+  /* The library's Tag is `white-space: nowrap` + fixed `height` by default
+     — fine for short text ("Regular 100/10m") but a boosted pet's longer
+     "Boosted 120/10m · 43h 41m left" needs to wrap onto a second line
+     rather than force the whole card (and its grid column) wider. */
+  height: auto !important;
+  white-space: normal !important;
+  text-align: left;
+  line-height: 1.3;
+  padding-top: 5px;
+  padding-bottom: 5px;
 }
 
 .pet-card__price {
@@ -1040,6 +1128,12 @@ body {
   font-weight: 600;
   margin: 0;
   opacity: 0.85;
+}
+
+.sanctuary__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .sanctuary__harvest-button {
@@ -1369,6 +1463,13 @@ body {
   font-size: 16px;
 }
 
+.takeover-modal__share-button {
+  /* Pulls it visually closer to the primary Collect button above (the
+     body's own flex `gap: 16px` otherwise spaces every child evenly) so
+     the two read as a single "primary + secondary" action pair. */
+  margin-top: -8px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .takeover-modal__sprite-wrap {
     animation: none;
@@ -1485,11 +1586,6 @@ body {
 }
 
 @media (max-width: 600px) {
-  .pet-grid,
-  .playpen-page__skeleton-grid {
-    grid-template-columns: 1fr;
-  }
-
   .playpen-page__heading {
     flex-direction: column;
     align-items: flex-start;

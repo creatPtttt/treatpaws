@@ -5,6 +5,7 @@ import { Coins, PartyPopper } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { PetSprite } from '../ui/PetSprite';
 import { getCreature } from '../../data/creatures';
+import { ShareOnXButton } from '../ui/ShareOnXButton';
 import { shortenAddress } from '../../wallet/format';
 import type { TakeoverDetails } from '../../utils/takeover';
 
@@ -120,6 +121,11 @@ export function TakeoverCelebrationModal({ details, onClose }: TakeoverCelebrati
         >
           Awesome! Collect Profits
         </Button>
+
+        {/* Doesn't close the modal or trigger confetti on its own — sharing
+            is an optional side action, collecting profits is the one that
+            dismisses the receipt. */}
+        <ShareOnXButton block className="takeover-modal__share-button" />
       </div>
     </Modal>
   );
