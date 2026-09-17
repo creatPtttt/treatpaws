@@ -1,0 +1,179 @@
+{
+  "version": "0.1.0",
+  "name": "idle_pet_game",
+  "instructions": [
+    {
+      "name": "initializeGame",
+      "accounts": [
+        { "name": "admin", "isMut": true, "isSigner": true },
+        { "name": "gameConfig", "isMut": true, "isSigner": false },
+        { "name": "rewardMint", "isMut": false, "isSigner": false },
+        { "name": "vault", "isMut": true, "isSigner": false },
+        { "name": "pet1", "isMut": true, "isSigner": false },
+        { "name": "pet2", "isMut": true, "isSigner": false },
+        { "name": "pet3", "isMut": true, "isSigner": false },
+        { "name": "pet4", "isMut": true, "isSigner": false },
+        { "name": "pet5", "isMut": true, "isSigner": false },
+        { "name": "pet6", "isMut": true, "isSigner": false },
+        { "name": "pet7", "isMut": true, "isSigner": false },
+        { "name": "pet8", "isMut": true, "isSigner": false },
+        { "name": "pet9", "isMut": true, "isSigner": false },
+        { "name": "pet10", "isMut": true, "isSigner": false },
+        { "name": "tokenProgram", "isMut": false, "isSigner": false },
+        { "name": "systemProgram", "isMut": false, "isSigner": false },
+        { "name": "rent", "isMut": false, "isSigner": false }
+      ],
+      "args": [{ "name": "initialPrices", "type": { "array": ["u64", 10] } }]
+    },
+    {
+      "name": "depositVault",
+      "accounts": [
+        { "name": "depositor", "isMut": false, "isSigner": true },
+        { "name": "gameConfig", "isMut": false, "isSigner": false },
+        { "name": "rewardMint", "isMut": false, "isSigner": false },
+        { "name": "depositorAta", "isMut": true, "isSigner": false },
+        { "name": "vault", "isMut": true, "isSigner": false },
+        { "name": "tokenProgram", "isMut": false, "isSigner": false }
+      ],
+      "args": [{ "name": "amount", "type": "u64" }]
+    },
+    {
+      "name": "withdrawVault",
+      "accounts": [
+        { "name": "admin", "isMut": true, "isSigner": true },
+        { "name": "gameConfig", "isMut": false, "isSigner": false },
+        { "name": "rewardMint", "isMut": false, "isSigner": false },
+        { "name": "adminAta", "isMut": true, "isSigner": false },
+        { "name": "vault", "isMut": true, "isSigner": false },
+        { "name": "tokenProgram", "isMut": false, "isSigner": false }
+      ],
+      "args": [{ "name": "amount", "type": "u64" }]
+    },
+    {
+      "name": "updateGameConfig",
+      "accounts": [
+        { "name": "admin", "isMut": false, "isSigner": true },
+        { "name": "gameConfig", "isMut": true, "isSigner": false }
+      ],
+      "args": [
+        { "name": "feeBasisPoints", "type": { "option": "u16" } },
+        { "name": "priceIncrementBps", "type": { "option": "u16" } },
+        { "name": "baseRewardRate", "type": { "option": "u64" } },
+        { "name": "boostRewardRate", "type": { "option": "u64" } },
+        { "name": "feedCost", "type": { "option": "u64" } },
+        { "name": "renameCost", "type": { "option": "u64" } }
+      ]
+    },
+    {
+      "name": "buyPet",
+      "accounts": [
+        { "name": "buyer", "isMut": true, "isSigner": true },
+        { "name": "admin", "isMut": true, "isSigner": false },
+        { "name": "previousOwner", "isMut": true, "isSigner": false },
+        { "name": "gameConfig", "isMut": false, "isSigner": false },
+        { "name": "rewardMint", "isMut": false, "isSigner": false },
+        { "name": "pet", "isMut": true, "isSigner": false },
+        { "name": "previousOwnerAta", "isMut": true, "isSigner": false },
+        { "name": "vault", "isMut": true, "isSigner": false },
+        { "name": "tokenProgram", "isMut": false, "isSigner": false },
+        { "name": "associatedTokenProgram", "isMut": false, "isSigner": false },
+        { "name": "systemProgram", "isMut": false, "isSigner": false }
+      ],
+      "args": [{ "name": "petId", "type": "u8" }]
+    },
+    {
+      "name": "claimCoins",
+      "accounts": [
+        { "name": "owner", "isMut": true, "isSigner": true },
+        { "name": "gameConfig", "isMut": false, "isSigner": false },
+        { "name": "rewardMint", "isMut": false, "isSigner": false },
+        { "name": "pet", "isMut": true, "isSigner": false },
+        { "name": "ownerAta", "isMut": true, "isSigner": false },
+        { "name": "vault", "isMut": true, "isSigner": false },
+        { "name": "tokenProgram", "isMut": false, "isSigner": false },
+        { "name": "associatedTokenProgram", "isMut": false, "isSigner": false },
+        { "name": "systemProgram", "isMut": false, "isSigner": false }
+      ],
+      "args": [{ "name": "petId", "type": "u8" }]
+    },
+    {
+      "name": "feedPet",
+      "accounts": [
+        { "name": "owner", "isMut": false, "isSigner": true },
+        { "name": "gameConfig", "isMut": false, "isSigner": false },
+        { "name": "rewardMint", "isMut": false, "isSigner": false },
+        { "name": "pet", "isMut": true, "isSigner": false },
+        { "name": "ownerAta", "isMut": true, "isSigner": false },
+        { "name": "vault", "isMut": true, "isSigner": false },
+        { "name": "tokenProgram", "isMut": false, "isSigner": false }
+      ],
+      "args": [{ "name": "petId", "type": "u8" }]
+    },
+    {
+      "name": "renamePet",
+      "accounts": [
+        { "name": "owner", "isMut": false, "isSigner": true },
+        { "name": "gameConfig", "isMut": false, "isSigner": false },
+        { "name": "rewardMint", "isMut": false, "isSigner": false },
+        { "name": "pet", "isMut": true, "isSigner": false },
+        { "name": "ownerAta", "isMut": true, "isSigner": false },
+        { "name": "vault", "isMut": true, "isSigner": false },
+        { "name": "tokenProgram", "isMut": false, "isSigner": false }
+      ],
+      "args": [
+        { "name": "petId", "type": "u8" },
+        { "name": "newName", "type": "string" }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "GameConfig",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          { "name": "admin", "type": "publicKey" },
+          { "name": "rewardMint", "type": "publicKey" },
+          { "name": "vaultBump", "type": "u8" },
+          { "name": "feeBasisPoints", "type": "u16" },
+          { "name": "priceIncrementBps", "type": "u16" },
+          { "name": "baseRewardRate", "type": "u64" },
+          { "name": "boostRewardRate", "type": "u64" },
+          { "name": "feedCost", "type": "u64" },
+          { "name": "renameCost", "type": "u64" }
+        ]
+      }
+    },
+    {
+      "name": "Pet",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          { "name": "id", "type": "u8" },
+          { "name": "owner", "type": "publicKey" },
+          { "name": "isInitialized", "type": "bool" },
+          { "name": "name", "type": "string" },
+          { "name": "currentPrice", "type": "u64" },
+          { "name": "lastClaimTimestamp", "type": "i64" },
+          { "name": "boostUntilTimestamp", "type": "i64" }
+        ]
+      }
+    }
+  ],
+  "errors": [
+    { "code": 6000, "name": "Unauthorized", "msg": "Unauthorized: signer is not allowed to perform this action" },
+    { "code": 6001, "name": "InvalidPetId", "msg": "Invalid pet id: must be between 1 and 10" },
+    { "code": 6002, "name": "InsufficientPayment", "msg": "Insufficient payment: buyer must pay the exact current price in lamports" },
+    { "code": 6003, "name": "NameTooLong", "msg": "Name too long or empty: name must be 1 to 32 bytes" },
+    { "code": 6004, "name": "AlreadyOwner", "msg": "Buyer already owns this pet" },
+    { "code": 6005, "name": "InsufficientVaultBalance", "msg": "Vault does not hold enough $GAME to pay this reward" },
+    { "code": 6006, "name": "InsufficientTokenBalance", "msg": "Owner token account does not hold enough $GAME" },
+    { "code": 6007, "name": "NothingToClaim", "msg": "No rewards to claim yet" },
+    { "code": 6008, "name": "Overflow", "msg": "Arithmetic overflow" },
+    { "code": 6009, "name": "PetNotInitialized", "msg": "Pet account is not initialized" },
+    { "code": 6010, "name": "InvalidAmount", "msg": "Amount must be greater than zero" },
+    { "code": 6011, "name": "InvalidPrice", "msg": "Initial or current price must be greater than zero" },
+    { "code": 6012, "name": "InvalidFee", "msg": "Fee basis points cannot exceed 10000" },
+    { "code": 6013, "name": "InvalidTimestamp", "msg": "Clock timestamp is invalid relative to last claim" }
+  ]
+}
