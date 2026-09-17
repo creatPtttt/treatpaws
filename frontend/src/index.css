@@ -1116,7 +1116,10 @@ body {
 
 .activity-drawer__item {
   display: flex;
-  align-items: center;
+  /* flex-start (not center) because rows now often span 3 lines (action
+     label + narrative sentence + signature link) once a rich `detail` is
+     present — centering made the icon drift oddly against taller rows. */
+  align-items: flex-start;
   gap: 12px;
   padding: 12px 4px;
   border-bottom: 1.5px dashed var(--animal-border-color, #e8dec7);
@@ -1129,6 +1132,7 @@ body {
 .activity-drawer__icon {
   flex-shrink: 0;
   display: flex;
+  margin-top: 2px;
   color: var(--animal-primary-color, #19c8b9);
 }
 
@@ -1137,12 +1141,71 @@ body {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
 }
 
 .activity-drawer__action {
   font-size: 13.5px;
   font-weight: 700;
+}
+
+/* The rich "who / which pet / how much" sentence built from
+   `ActivityHighlightPart[]` — see `ActivityNarrativePart` in
+   ActivityDrawer.tsx. Wraps naturally across lines on the narrow 380px
+   drawer. */
+.activity-drawer__narrative {
+  font-size: 12.5px;
+  line-height: 1.55;
+  opacity: 0.92;
+}
+
+/* Shortened wallet addresses, e.g. `7xK…4np8` — a soft monospace badge so
+   they read as "data" distinct from the surrounding sentence. */
+.activity-drawer__addr {
+  font-family: ui-monospace, SFMono-Regular, Consolas, 'Liberation Mono', monospace;
+  font-size: 11.5px;
+  font-weight: 700;
+  background: rgba(0, 0, 0, 0.06);
+  border-radius: 6px;
+  padding: 1px 5px;
+  white-space: nowrap;
+}
+
+/* Pet names inside a narrative sentence — bold warm caramel, matching the
+   feed/rename icon tint used elsewhere in this drawer. */
+.activity-drawer__pet {
+  font-weight: 800;
+  color: #b45309;
+}
+
+/* SOL / $TREAT amount pills, e.g. `+0.0117 SOL`, `−500 $TREAT`. */
+.activity-drawer__amount {
+  display: inline-flex;
+  align-items: center;
+  font-weight: 800;
+  border-radius: 999px;
+  padding: 1px 8px;
+  white-space: nowrap;
+}
+
+.activity-drawer__amount--sol.activity-drawer__amount--gain {
+  background: rgba(34, 197, 94, 0.16);
+  color: #15803d;
+}
+
+.activity-drawer__amount--sol.activity-drawer__amount--spend {
+  background: rgba(220, 38, 38, 0.12);
+  color: #b91c1c;
+}
+
+.activity-drawer__amount--treat.activity-drawer__amount--gain {
+  background: rgba(234, 179, 8, 0.2);
+  color: #92600a;
+}
+
+.activity-drawer__amount--treat.activity-drawer__amount--spend {
+  background: rgba(180, 83, 9, 0.16);
+  color: #92400e;
 }
 
 .activity-drawer__signature {
@@ -1155,6 +1218,7 @@ body {
 
 .activity-drawer__time {
   flex-shrink: 0;
+  margin-top: 2px;
   font-size: 12px;
   font-weight: 600;
   opacity: 0.6;

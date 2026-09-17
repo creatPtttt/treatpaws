@@ -220,7 +220,7 @@ export function PlaypenPage() {
         />
       )}
 
-      <ActivityDrawer open={logOpen} onClose={() => setLogOpen(false)} />
+      <ActivityDrawer open={logOpen} onClose={() => setLogOpen(false)} pets={pets} />
 
       <TakeoverCelebrationModal
         details={celebrationQueue[0] ?? null}
