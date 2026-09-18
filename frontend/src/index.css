@@ -19,6 +19,36 @@ body {
   color: var(--animal-text-color, #725d42);
 }
 
+/* animal-island-ui <Cursor> wrapper — fill the viewport so the cozy glove
+   applies end-to-end without collapsing the sticky header / page flex. */
+.app-cursor.animal-cursor {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.app-cursor.animal-cursor .page {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/*
+ * Interactive grab states — forceAll uses !important on every descendant, so
+ * these two-class selectors beat `.animal-cursor--force *` for pet drag UX.
+ * SVGs match the library finger palette (cream fill + caramel stroke).
+ */
+.app-cursor.animal-cursor--force .roaming-pet--mine {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cpath d='M10 14 V8.5 a2 2 0 0 1 4 0 V13 M14 13 V7.5 a2 2 0 0 1 4 0 V13 M18 13 V8.2 a2 2 0 0 1 4 0 V14.5 M22 14.5 V11 a2 2 0 0 1 3.6 1.2 L24.5 22.5 A6 6 0 0 1 18.6 28 H13.2 A5 5 0 0 1 8.5 23.5 V16 a2.2 2.2 0 0 1 4.2-.4' fill='%23fff7e6' stroke='%23794f27' stroke-width='2' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E")
+      10 8,
+    grab !important;
+}
+
+.app-cursor.animal-cursor--force .roaming-pet--dragging {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cpath d='M9 15.5 V18.5 A6.5 6.5 0 0 0 15.5 25 h5 A6 6 0 0 0 26.4 19.8 L27 16.2 A2.1 2.1 0 0 0 23 15.6 L22.2 17.2 V12.5 a1.8 1.8 0 0 0-3.6 0 V16 M18.6 16 V11.2 a1.8 1.8 0 0 0-3.6 0 V16 M15 16 V12 a1.8 1.8 0 0 0-3.6 0 V16.4 M11.4 16.4 V14.2 a1.7 1.7 0 0 0-3.3.6 V18' fill='%23fff7e6' stroke='%23794f27' stroke-width='2' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E")
+      12 10,
+    grabbing !important;
+}
+
 .page {
   display: flex;
   flex-direction: column;
@@ -115,6 +145,41 @@ body {
   gap: 6px;
   white-space: nowrap;
   cursor: pointer;
+}
+
+.site-header__companion-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  margin: 0;
+  padding: 0;
+  border: 2px solid var(--animal-border-color, #e8dec7);
+  border-radius: 50%;
+  background: var(--animal-bg-color, #fef9e7);
+  color: var(--animal-text-color, #725d42);
+  transition:
+    transform 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+    background 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+    color 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.site-header__companion-toggle:hover {
+  transform: translateY(-2px);
+  border-color: var(--animal-primary-color, #19c8b9);
+  color: var(--animal-primary-color, #19c8b9);
+}
+
+.site-header__companion-toggle:active {
+  transform: translateY(0) scale(0.96);
+}
+
+.site-header__companion-toggle--active {
+  background: var(--animal-primary-color-bg, #e6f9f6);
+  border-color: var(--animal-primary-color, #19c8b9);
+  color: var(--animal-primary-color, #19c8b9);
 }
 
 .site-header__balance {
@@ -917,6 +982,377 @@ body {
   display: flex;
   flex-direction: column;
   gap: 14px;
+}
+
+.playpen-view {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.playpen-view__switcher {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+/* -------------------------------------------------------------------------
+   Island Roaming Playground (petdex-style desktop mascots)
+   ------------------------------------------------------------------------- */
+
+.roaming-playground {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.roaming-playground__hint {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--animal-text-color, #725d42);
+  opacity: 0.85;
+}
+
+.roaming-playground__yard {
+  position: relative;
+  width: 100%;
+  /* Taller yard so the island reads as a playpen, not a thin letterbox strip. */
+  height: clamp(520px, 62vh, 680px);
+  overflow: hidden;
+  border-radius: 28px;
+  border: 2.5px solid var(--animal-border-color, #cfe9c9);
+  background:
+    linear-gradient(180deg, #b8e4f5 0%, #d7f0c8 42%, #8fbf6a 100%);
+  box-shadow: inset 0 -18px 0 rgba(90, 130, 60, 0.18);
+  touch-action: none;
+  user-select: none;
+}
+
+/* Optional cover image from /playground-bg.png — gradient stays as fallback. */
+.roaming-playground__yard--custom-bg {
+  background-color: #9ecf72;
+  background-size: cover;
+  background-position: center 55%;
+  background-repeat: no-repeat;
+  box-shadow: none;
+}
+
+@media (max-width: 640px) {
+  .roaming-playground__yard {
+    height: clamp(420px, 55vh, 560px);
+    border-radius: 22px;
+  }
+}
+
+.roaming-playground__sky {
+  position: absolute;
+  inset: 0 0 55% 0;
+  background:
+    radial-gradient(circle at 18% 28%, rgba(255, 255, 255, 0.7) 0 18px, transparent 19px),
+    radial-gradient(circle at 22% 30%, rgba(255, 255, 255, 0.55) 0 28px, transparent 29px),
+    radial-gradient(circle at 72% 22%, rgba(255, 255, 255, 0.65) 0 22px, transparent 23px),
+    radial-gradient(circle at 78% 24%, rgba(255, 255, 255, 0.45) 0 34px, transparent 35px);
+  pointer-events: none;
+}
+
+.roaming-playground__fence {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 18px;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      #9a6b3f 0 10px,
+      #b8844f 10px 14px,
+      transparent 14px 22px
+    );
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.roaming-playground__grass {
+  position: absolute;
+  inset: 48% 0 0 0;
+  background:
+    radial-gradient(ellipse at 20% 40%, rgba(120, 180, 70, 0.35) 0 40px, transparent 41px),
+    radial-gradient(ellipse at 70% 55%, rgba(100, 160, 55, 0.28) 0 55px, transparent 56px),
+    radial-gradient(ellipse at 45% 75%, rgba(140, 190, 80, 0.22) 0 70px, transparent 71px);
+  pointer-events: none;
+}
+
+.roaming-pet {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: grab;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  will-change: transform;
+  transition: filter 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.roaming-pet--visitor {
+  cursor: pointer;
+}
+
+.roaming-pet:hover {
+  filter: drop-shadow(0 4px 0 rgba(80, 60, 40, 0.12));
+}
+
+.roaming-pet:focus-visible {
+  outline: 2px solid var(--animal-primary-color, #19c8b9);
+  outline-offset: 4px;
+  border-radius: 16px;
+}
+
+.roaming-pet--dragging {
+  cursor: grabbing;
+  filter: drop-shadow(0 10px 8px rgba(80, 60, 40, 0.2));
+}
+
+.roaming-pet--bounce .action-pet-sprite {
+  animation: roaming-pet-bounce 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes roaming-pet-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+}
+
+.roaming-pet__zzz {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  display: inline-flex;
+  gap: 1px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 12px;
+  color: var(--animal-text-color, #725d42);
+  opacity: 0.75;
+  pointer-events: none;
+}
+
+.roaming-pet__zzz span {
+  display: inline-block;
+  animation: roaming-zzz 1.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.roaming-pet__zzz span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.roaming-pet__zzz span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes roaming-zzz {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.35;
+  }
+  50% {
+    transform: translateY(-6px);
+    opacity: 1;
+  }
+}
+
+.roaming-pet__heart {
+  position: absolute;
+  top: -4px;
+  left: 50%;
+  color: #f08aa0;
+  pointer-events: none;
+  animation: roaming-heart 0.9s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes roaming-heart {
+  0% {
+    transform: translate(-50%, 8px) scale(0.6);
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -28px) scale(1.15);
+    opacity: 0;
+  }
+}
+
+.roaming-pet__bubble {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 8px);
+  transform: translateX(-50%);
+  min-width: 132px;
+  padding: 10px 12px;
+  border-radius: 18px;
+  background: var(--animal-bg-color, #fef9e7);
+  border: 1.5px solid var(--animal-border-color, #e8dec7);
+  color: var(--animal-text-color, #725d42);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.35;
+  text-align: center;
+  pointer-events: none;
+  box-shadow: 0 4px 0 rgba(114, 93, 66, 0.08);
+  z-index: 30;
+  white-space: nowrap;
+}
+
+.roaming-pet__bubble::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -7px;
+  width: 12px;
+  height: 12px;
+  transform: translateX(-50%) rotate(45deg);
+  background: var(--animal-bg-color, #fef9e7);
+  border-right: 1.5px solid var(--animal-border-color, #e8dec7);
+  border-bottom: 1.5px solid var(--animal-border-color, #e8dec7);
+}
+
+.roaming-pet__bubble-name {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 13px;
+}
+
+.roaming-pet__bubble-owner {
+  opacity: 0.75;
+  font-size: 11px;
+}
+
+/* Snatch pitch for non-owned pets — interactive (buy button). */
+.roaming-pet__snatch {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 10px);
+  transform: translateX(-50%);
+  width: min(220px, 70vw);
+  padding: 12px 14px;
+  border-radius: 20px;
+  background: var(--animal-bg-color, #fef9e7);
+  border: 1.5px solid var(--animal-border-color, #e8dec7);
+  color: var(--animal-text-color, #725d42);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+  text-align: center;
+  pointer-events: auto;
+  box-shadow: 0 6px 0 rgba(114, 93, 66, 0.1);
+  z-index: 40;
+}
+
+.roaming-pet__snatch-copy {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+/* -------------------------------------------------------------------------
+   Global cursor-follower companion (Option B)
+   ------------------------------------------------------------------------- */
+
+.global-pet-follower {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.global-pet-follower__layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 64px;
+  height: 64px;
+  will-change: transform;
+  pointer-events: none;
+}
+
+.global-pet-follower__hit {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  pointer-events: auto;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.global-pet-follower__zzz {
+  position: absolute;
+  top: 0;
+  right: 2px;
+  display: inline-flex;
+  gap: 1px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 11px;
+  color: var(--animal-text-color, #725d42);
+  opacity: 0.75;
+  pointer-events: none;
+}
+
+.global-pet-follower__zzz span {
+  display: inline-block;
+  animation: roaming-zzz 1.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.global-pet-follower__zzz span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.global-pet-follower__zzz span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+.global-pet-follower__heart {
+  position: absolute;
+  top: -2px;
+  left: 50%;
+  color: #f08aa0;
+  pointer-events: none;
+  animation: roaming-heart 0.9s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .roaming-pet--bounce .action-pet-sprite,
+  .roaming-pet__zzz span,
+  .roaming-pet__heart,
+  .global-pet-follower__zzz span,
+  .global-pet-follower__heart {
+    animation: none;
+  }
 }
 
 /*

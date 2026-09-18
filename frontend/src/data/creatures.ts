@@ -15,8 +15,8 @@
 // row 0 is the idle animation (8 frames) that TreatPaws actually uses. The
 // full sheets (with the other 8-10 unused animation-state rows) live at
 // `~/.petdex/pets/<slug>/spritesheet.webp` after installing; only the
-// cropped idle row is shipped to the browser (see `scripts/generate-pet-sprites.mjs`
-// and `public/pets/<slug>/idle.webp`).
+// cropped idle row is shipped for card views; the full sheet is also copied
+// to `public/pets/<slug>/spritesheet.webp` for the Island Playground roamers.
 export interface Creature {
   /** petdex catalog slug — also the folder name under public/pets/. */
   slug: string;
@@ -65,4 +65,31 @@ export function getCreature(petId: number): Creature {
 /** Local, pre-cropped idle-loop asset path (see scripts/generate-pet-sprites.mjs). */
 export function getCreatureIdleAssetPath(slug: string): string {
   return `/pets/${slug}/idle.webp`;
+}
+
+/** Full multi-row petdex spritesheet (idle / walk / jump / sleep rows). */
+export function getCreatureSpritesheetPath(slug: string): string {
+  return `/pets/${slug}/spritesheet.webp`;
+}
+
+/**
+ * Petdex animation row indices (192×208 frames, 8 columns).
+ * Matches the desktop-mascot sheet layout used on petdex.dev.
+ */
+export const PET_ACTION_ROWS = {
+  idle: 0,
+  runningRight: 1,
+  runningLeft: 2,
+  jumping: 4,
+  sleeping: 6,
+} as const;
+
+export type PetAction = keyof typeof PET_ACTION_ROWS;
+
+/** How many real frames to play for an action row (falls back to idle count). */
+export function getActionFrameCount(creature: Creature, action: PetAction): number {
+  // Most petdex companions reuse the same populated-column count across rows.
+  // Jumping often feels punchier with fewer frames; keep at least 4.
+  if (action === 'jumping') return Math.max(4, Math.min(creature.idleFrameCount, 6));
+  return creature.idleFrameCount;
 }

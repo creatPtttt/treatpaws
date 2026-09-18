@@ -114,6 +114,24 @@ or upgrade the anchor package together with `useProgram.ts`'s `new Program(...)`
   (SOL), shortened owner address (+ a **Mine** tag), a live-ticking `$TREAT accrued`
   counter (`useLiveRewards`, updates every second, purely client-side math — no extra
   RPC calls), and a Regular/Boosted status tag with remaining boost time.
+- The **All Pets** tab also has a **Cards View / Roaming Playground** switcher. Roaming
+  mode opens a grassy playpen (`clamp(520px, 62vh, 680px)` tall) where pets wander, nap, and react like
+  [petdex.dev](https://petdex.dev) desktop mascots (`usePetAI` + full multi-row
+  `spritesheet.webp` actions: idle / walk / jump / sleep). **Owned pets** can be
+  clicked (pet + ❤️) and dragged; **other trainers' pets** cannot be dragged — a
+  click opens a snatch bubble with a direct Buy button. Hover still shows name +
+  price + live $TREAT. Drop an optional cover image at `public/playground-bg.png`
+  (slightly oversized `background-size` + offset so the lawn fills the yard and any
+  bottom-corner watermark is clipped). If missing, the cozy CSS gradient + fence
+  remains. When the photo is present the CSS fence overlay is skipped so it
+  doesn't clash with the image.
+- **Global cursor companion** (`GlobalPetFollower.tsx`): when the connected wallet
+  owns ≥1 pet and is *not* inside Roaming Playground, the primary owned pet follows
+  the mouse (~70px buffer, `pointer-events-none` transit layer so UI stays clickable).
+  Idle after 5s of stillness, nap after 15s; click the mascot for a ❤️. A header
+  bell whistle toggles Active / Resting (persisted in `localStorage`). The site uses
+  `animal-island-ui`'s `<Cursor forceAll>` glove (plus grab/grabbing hands on pets).
+
 - Owners see **Claim / Feed / Rename**; everyone else sees **Snatch for X SOL**. Feed and
   Rename open confirmation modals (`FeedConfirmModal.tsx`, `RenameModal.tsx`); Buy/Claim
   fire directly since the price is already visible on the button.

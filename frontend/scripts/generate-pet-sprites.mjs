@@ -13,6 +13,8 @@
 //
 // Source spritesheets must already exist locally (via `npx petdex install
 // <slug>`, which writes to ~/.petdex/pets/<slug>/spritesheet.webp).
+// For Island Playground roamers, also copy that full multi-row sheet into
+// `public/pets/<slug>/spritesheet.webp` (rows 0/1/2/4/6 = idle/runR/runL/jump/sleep).
 
 import { existsSync, mkdirSync } from 'node:fs';
 import { homedir } from 'node:os';

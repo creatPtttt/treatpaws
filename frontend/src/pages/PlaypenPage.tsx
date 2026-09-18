@@ -1,12 +1,13 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Button, Card, Skeleton, Tabs } from 'animal-island-ui';
 import { PublicKey } from '@solana/web3.js';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { ScrollText } from 'lucide-react';
+import { LayoutGrid, ScrollText, Trees } from 'lucide-react';
 import { useProgram } from '../anchor/useProgram';
 import * as ix from '../anchor/instructions';
 import type { PetView } from '../anchor/types';
 import type { TakeoverDetails } from '../utils/takeover';
+import { useCompanionGate } from '../context/CompanionGateContext';
 import { useGameConfig } from '../hooks/useGameConfig';
 import { usePets } from '../hooks/usePets';
 import { useTransactionRunner } from '../hooks/useTransactionRunner';
@@ -18,14 +19,18 @@ import { HallOfFame } from '../components/playpen/HallOfFame';
 import { ActivityDrawer } from '../components/playpen/ActivityDrawer';
 import { TakeoverCelebrationModal } from '../components/playpen/TakeoverCelebrationModal';
 import { NotInitializedNotice } from '../components/playpen/NotInitializedNotice';
+import { RoamingPlayground } from '../components/playpen/RoamingPlayground';
 
 const SKELETON_SLOTS = Array.from({ length: 10 }, (_, index) => index);
 const HARVEST_ALL_KEY = 'harvest-all';
+
+type PlaypenViewMode = 'cards' | 'roaming';
 
 /** The live game hall ("/playpen") — on-chain pet grid, My Sanctuary hub, and Hall of Fame leaderboard. */
 export function PlaypenPage() {
   const program = useProgram();
   const { publicKey } = useWallet();
+  const { setSuppressFollower } = useCompanionGate();
   const {
     gameConfig,
     notInitialized: configMissing,
@@ -42,7 +47,15 @@ export function PlaypenPage() {
   } = usePets(program);
   const { pendingKey, run } = useTransactionRunner();
   const [activeTab, setActiveTab] = useState('playpen');
+  const [playpenView, setPlaypenView] = useState<PlaypenViewMode>('cards');
   const [logOpen, setLogOpen] = useState(false);
+
+  // Hide the global cursor companion while trainers are inside the grassy yard.
+  useEffect(() => {
+    const inRoamingYard = activeTab === 'playpen' && playpenView === 'roaming';
+    setSuppressFollower(inRoamingYard);
+    return () => setSuppressFollower(false);
+  }, [activeTab, playpenView, setSuppressFollower]);
   // Queue rather than a single slot — if multiple pets were bought out
   // while this tab was closed, each gets its own celebration in turn
   // instead of only the first (or last) one ever being shown.
@@ -176,20 +189,49 @@ export function PlaypenPage() {
               key: 'playpen',
               label: `All Pets (${pets.length})`,
               children: (
-                <div className="pet-grid">
-                  {pets.map((pet) => (
-                    <PetCard
-                      key={pet.id}
-                      pet={pet}
+                <div className="playpen-view">
+                  <div className="playpen-view__switcher" role="group" aria-label="Playpen view mode">
+                    <Button
+                      type={playpenView === 'cards' ? 'primary' : 'default'}
+                      icon={<LayoutGrid size={16} />}
+                      onClick={() => setPlaypenView('cards')}
+                    >
+                      Cards View
+                    </Button>
+                    <Button
+                      type={playpenView === 'roaming' ? 'primary' : 'default'}
+                      icon={<Trees size={16} />}
+                      onClick={() => setPlaypenView('roaming')}
+                    >
+                      Roaming Playground
+                    </Button>
+                  </div>
+
+                  {playpenView === 'cards' ? (
+                    <div className="pet-grid">
+                      {pets.map((pet) => (
+                        <PetCard
+                          key={pet.id}
+                          pet={pet}
+                          gameConfig={gameConfig}
+                          currentUser={publicKey}
+                          pendingKey={pendingKey}
+                          onBuy={handleBuy}
+                          onClaim={handleClaim}
+                          onFeed={handleFeed}
+                          onRename={handleRename}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <RoamingPlayground
+                      pets={pets}
                       gameConfig={gameConfig}
                       currentUser={publicKey}
                       pendingKey={pendingKey}
                       onBuy={handleBuy}
-                      onClaim={handleClaim}
-                      onFeed={handleFeed}
-                      onRename={handleRename}
                     />
-                  ))}
+                  )}
                 </div>
               ),
             },

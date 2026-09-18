@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { Button, Tag } from 'animal-island-ui';
+import { Button, Tag, Tooltip } from 'animal-island-ui';
 import { Link, useLocation } from 'react-router-dom';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { Leaf, Menu, X } from 'lucide-react';
+import { Bell, BellOff, Leaf, Menu, X } from 'lucide-react';
 import { PawLogo } from '../ui/PawLogo';
 import { DevnetPreviewModal } from './DevnetPreviewModal';
+import { useCompanionGate } from '../../context/CompanionGateContext';
 import { useWalletBalance } from '../../wallet/useWalletBalance';
 import { useEnterGame } from '../../hooks/useEnterGame';
 import { formatSol, shortenAddress } from '../../wallet/format';
@@ -34,6 +35,11 @@ export function SiteHeader() {
   const location = useLocation();
   const enterGame = useEnterGame();
   const isLanding = location.pathname === '/';
+  const { companionAvailable, followerEnabled, setFollowerEnabled } = useCompanionGate();
+
+  const companionTooltip = followerEnabled
+    ? 'Companion active — click to rest in sanctuary'
+    : 'Companion resting in sanctuary';
 
   return (
     <header className="site-header">
@@ -68,6 +74,21 @@ export function SiteHeader() {
               Devnet
             </Tag>
           </span>
+
+          {/* Whistle the cursor companion awake / send it to rest. */}
+          {companionAvailable && (
+            <Tooltip title={companionTooltip} variant="island" placement="bottom">
+              <button
+                type="button"
+                className={`site-header__companion-toggle${followerEnabled ? ' site-header__companion-toggle--active' : ''}`}
+                aria-pressed={followerEnabled}
+                aria-label={followerEnabled ? 'Companion active' : 'Companion resting'}
+                onClick={() => setFollowerEnabled(!followerEnabled)}
+              >
+                {followerEnabled ? <Bell size={18} aria-hidden="true" /> : <BellOff size={18} aria-hidden="true" />}
+              </button>
+            </Tooltip>
+          )}
 
           {/* Official Solana wallet-adapter connect button, restyled via CSS
               (see .wallet-adapter-button overrides in index.css) to match the

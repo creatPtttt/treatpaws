@@ -4,6 +4,8 @@ import { SiteHeader } from './components/layout/SiteHeader';
 import { SiteFooter } from './components/layout/SiteFooter';
 import { RequireWallet } from './components/guards/RequireWallet';
 import { RequireAdmin } from './components/guards/RequireAdmin';
+import { GlobalPetFollower } from './components/GlobalPetFollower';
+import { CompanionGateProvider } from './context/CompanionGateContext';
 import { LandingPage } from './pages/LandingPage';
 import { PlaypenPage } from './pages/PlaypenPage';
 import { AdminPage } from './pages/AdminPage';
@@ -22,33 +24,37 @@ import { NotFoundPage } from './pages/NotFoundPage';
  */
 export default function App() {
   return (
-    <Cursor>
-      <div className="page">
-        <SiteHeader />
-        <main>
-          <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route
-              path="/playpen"
-              element={
-                <RequireWallet>
-                  <PlaypenPage />
-                </RequireWallet>
-              }
-            />
-            <Route
-              path="/admin"
-              element={
-                <RequireAdmin>
-                  <AdminPage />
-                </RequireAdmin>
-              }
-            />
-            <Route path="*" element={<NotFoundPage />} />
-          </Routes>
-        </main>
-        <SiteFooter />
-      </div>
+    <Cursor type="default" forceAll className="app-cursor">
+      <CompanionGateProvider>
+        <div className="page">
+          <SiteHeader />
+          <main>
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+              <Route
+                path="/playpen"
+                element={
+                  <RequireWallet>
+                    <PlaypenPage />
+                  </RequireWallet>
+                }
+              />
+              <Route
+                path="/admin"
+                element={
+                  <RequireAdmin>
+                    <AdminPage />
+                  </RequireAdmin>
+                }
+              />
+              <Route path="*" element={<NotFoundPage />} />
+            </Routes>
+          </main>
+          <SiteFooter />
+          {/* Cursor companion — hides itself while Roaming Playground is open. */}
+          <GlobalPetFollower />
+        </div>
+      </CompanionGateProvider>
     </Cursor>
   );
 }

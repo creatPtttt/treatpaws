@@ -7,6 +7,10 @@ import { BrowserRouter } from 'react-router-dom';
 // unstyled (see the skill's hard rule #2).
 import 'animal-island-ui/style';
 
+// Cursor styles ship as a separate file (not merged into animal-island-ui/style).
+// Without this import, `<Cursor forceAll>` adds classes but the cozy glove never appears.
+import 'animal-island-ui/es/components/Cursor/cursor.css';
+
 // Official Solana wallet-adapter UI styles (Connect button + wallet modal).
 import '@solana/wallet-adapter-react-ui/styles.css';
 
