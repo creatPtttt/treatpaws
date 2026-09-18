@@ -1,5 +1,4 @@
 import { HeroSection } from '../components/sections/HeroSection';
-import { ActivityTicker } from '../components/sections/ActivityTicker';
 import { VaultStats } from '../components/sections/VaultStats';
 import { HowItWorks } from '../components/sections/HowItWorks';
 import { PetsShowcase } from '../components/sections/PetsShowcase';
@@ -11,7 +10,6 @@ export function LandingPage() {
   return (
     <>
       <HeroSection />
-      <ActivityTicker />
       <VaultStats />
       <HowItWorks />
       <PetsShowcase />

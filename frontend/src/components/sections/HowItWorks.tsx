@@ -1,7 +1,7 @@
 import { Card, Title } from 'animal-island-ui';
 import { HOW_IT_WORKS_STEPS } from '../../data/howItWorks';
 
-/** 3-step explainer: Adopt/Snatch → Idle Harvest → Takeover Profit. */
+/** 3-step explainer: Adopt/Snatch → Bake & Snack → Takeover Profit. */
 export function HowItWorks() {
   return (
     <section className="section" id="how-it-works" aria-label="How It Works">

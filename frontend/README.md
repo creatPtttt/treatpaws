@@ -93,6 +93,7 @@ auto-navigates the instant a connection succeeds.
 | Live per-second reward ticker — single pet / summed across many | `src/hooks/useLiveRewards.ts`, `src/hooks/useAggregateRewards.ts` (both share the pure formula in `src/utils/rewards.ts`, mirroring `calculate_pending_rewards` from `lib.rs`) |
 | $TREAT mint decimals (for whole-token ↔ raw u64 conversion) | `src/hooks/useMintDecimals.ts` |
 | Vault PDA $TREAT remaining (for admin Max withdraw) | `src/hooks/useVaultBalance.ts` |
+| Landing-page vault reserve + pet grid (2-minute sessionStorage cache) | `src/hooks/useCachedVaultReserve.ts`, `src/hooks/useCachedShowcasePets.ts`, `src/utils/sessionCache.ts` |
 | Toast + per-action loading state around every `.rpc()` call | `src/hooks/useTransactionRunner.ts` |
 | Zero-HTTP-polling live buyout detection via `connection.onLogs` | `src/hooks/useProgramEvents.ts` |
 | Offline "welcome back" buyout detection (localStorage snapshot diff) | `src/hooks/useOfflineTakeoverDetection.ts` |
@@ -190,15 +191,14 @@ per-button loading spinner (`<Button loading>`) and a success/error toast (the
 
 | Section | File | Notes |
 | --- | --- | --- |
-| Header / Navbar | `src/components/layout/SiteHeader.tsx` | Route-aware: full anchor nav + "Enter TreatPaws" CTA on `/`; collapses to a "Home" link elsewhere. Logo, Devnet badge, wallet connect + balance always visible. |
+| Header / Navbar | `src/components/layout/SiteHeader.tsx` | Route-aware: full anchor nav + "Enter TreatPaws" CTA on `/`; collapses to a "Home" link elsewhere. Logo, clickable Devnet pill (opens `DevnetPreviewModal`), wallet connect + balance always visible. |
 | Hero | `src/components/sections/HeroSection.tsx` | Headline, subtitle, "playpen" `<Card>` with 4 real animated genesis pets idling, two CTAs. |
-| Live activity ticker | `src/components/sections/ActivityTicker.tsx` | Auto-scrolling banner of mock on-chain events (feed/takeover/claim). |
-| Global Treat Vault stats | `src/components/sections/VaultStats.tsx` | 4 `<Card>`s: vault reserve, pet count, base production rate, contract network. |
-| How It Works | `src/components/sections/HowItWorks.tsx` | 3-step `<Card>` explainer. |
-| Genesis Pets showcase | `src/components/sections/PetsShowcase.tsx` | 5×2 grid, mock preview data — every button routes into `/playpen` (via `useEnterGame`) where the *real* on-chain pets live. |
+| Global Treat Vault stats | `src/components/sections/VaultStats.tsx` | 4 `<Card>`s: live vault reserve (2-minute sessionStorage cache), pet count, base production rate, contract network. |
+| How It Works | `src/components/sections/HowItWorks.tsx` | 3-step `<Card>` explainer (Adopt or Snatch, Bake & Snack, Takeover Profit). |
+| Genesis Pets showcase | `src/components/sections/PetsShowcase.tsx` | 5×2 grid of live on-chain pets (name, price, owner) with a 2-minute sessionStorage cache. Buttons still route into `/playpen` via `useEnterGame`. |
 | $TREAT Yield Calculator | `src/components/sections/YieldCalculator.tsx` | Days-of-holding slider + Snack Boost `<Switch>`, live projected earnings. |
-| FAQ | `src/components/sections/FaqSection.tsx` | 4 stacked `<Collapse>` panels. |
-| Footer | `src/components/layout/SiteFooter.tsx` | Social placeholders, Devnet Explorer links for the program + $TREAT mint, then the library's `<Footer>` copyright bar. |
+| FAQ | `src/components/sections/FaqSection.tsx` | 5 stacked `<Collapse>` panels, including the Devnet / Mainnet launch note. |
+| Footer | `src/components/layout/SiteFooter.tsx` | X / Telegram / Discord icons all link to `https://x.com/treatpaws`. Program / $TREAT mint links open an `ExplorerVerifyModal` before Solana Explorer (Devnet). Tagline: "Cozy pixel companions baking sweet treats on Solana · Built for pure fun." Then the library's `<Footer>` copyright bar. |
 
 Shared pieces live in `src/components/ui/` (`PawLogo`, `PetSprite`, `DaySlider`),
 `src/components/guards/` (`RequireWallet`, `RequireAdmin`, `GuardScreen`), and
@@ -284,8 +284,7 @@ npm uninstall sharp
 The `petdex` CLI itself is MIT-licensed, but that does **not** extend to the individual
 pet artwork submitted by community members to the gallery — it was created for personal
 desktop-mascot use (Petdex Desktop / Codex Desktop), not for redistribution inside a
-third-party product. Authors are credited in the site footer
-(`src/components/layout/SiteFooter.tsx`) and in the table above as a good-faith courtesy,
+third-party product. Authors are credited in the table above as a good-faith courtesy,
 but **before any mainnet launch or real marketing push, get explicit permission from each
 author (or commission original art) to avoid IP issues.** This is fine for a Devnet demo.
 
@@ -293,7 +292,5 @@ author (or commission original art) to avoid IP issues.** This is fine for a Dev
 
 ## What's still not wired up
 
-1. **Live activity ticker** (`src/data/activity.ts`) is still mock data — hook it up to
-   program log subscriptions or an off-chain indexer if you want real events.
-2. Update `src/data/chain.ts` (`PROGRAM_ID`, `TREAT_MINT`) and the RPC cluster in
+1. Update `src/data/chain.ts` (`PROGRAM_ID`, `TREAT_MINT`) and the RPC cluster in
    `WalletContextProvider.tsx` when moving from Devnet to Mainnet.

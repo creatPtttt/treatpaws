@@ -3,8 +3,9 @@ import { Button, Tag } from 'animal-island-ui';
 import { Link, useLocation } from 'react-router-dom';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { Menu, X } from 'lucide-react';
+import { Leaf, Menu, X } from 'lucide-react';
 import { PawLogo } from '../ui/PawLogo';
+import { DevnetPreviewModal } from './DevnetPreviewModal';
 import { useWalletBalance } from '../../wallet/useWalletBalance';
 import { useEnterGame } from '../../hooks/useEnterGame';
 import { formatSol, shortenAddress } from '../../wallet/format';
@@ -29,6 +30,7 @@ export function SiteHeader() {
   const { connected, publicKey } = useWallet();
   const balance = useWalletBalance();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [devnetOpen, setDevnetOpen] = useState(false);
   const location = useLocation();
   const enterGame = useEnterGame();
   const isLanding = location.pathname === '/';
@@ -54,10 +56,18 @@ export function SiteHeader() {
         )}
 
         <div className="site-header__actions">
-          {/* Devnet badge — always visible so trainers know real mainnet SOL is not at risk */}
-          <Tag color="app-teal" variant="soft" className="site-header__devnet-tag">
-            Devnet
-          </Tag>
+          {/* Clickable Devnet pill — opens a cozy preview modal (not a live-SOL warning toast). */}
+          <span className="site-header__devnet-wrap">
+            <Tag
+              color="app-teal"
+              variant="soft"
+              className="site-header__devnet-tag"
+              onClick={() => setDevnetOpen(true)}
+            >
+              <Leaf size={14} aria-hidden="true" />
+              Devnet
+            </Tag>
+          </span>
 
           {/* Official Solana wallet-adapter connect button, restyled via CSS
               (see .wallet-adapter-button overrides in index.css) to match the
@@ -111,6 +121,8 @@ export function SiteHeader() {
           ))}
         </nav>
       )}
+
+      <DevnetPreviewModal open={devnetOpen} onClose={() => setDevnetOpen(false)} />
     </header>
   );
 }

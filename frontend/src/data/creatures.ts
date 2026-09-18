@@ -3,11 +3,11 @@
 // community gallery via `npx petdex install <slug>`.
 //
 // ATTRIBUTION: these sprites are community-submitted art, not TreatPaws'
-// own. Authors are credited below and in the site footer per petdex's
-// gallery norms. Before using them beyond a Devnet demo (mainnet launch,
-// any commercial use), get explicit permission from each author or swap in
-// commissioned art — the petdex CLI itself is MIT-licensed, but that does
-// NOT extend to the individual pet artwork submitted by gallery users.
+// own. Authors are credited below per petdex's gallery norms. Before using
+// them beyond a Devnet demo (mainnet launch, any commercial use), get
+// explicit permission from each author or swap in commissioned art. The
+// petdex CLI itself is MIT-licensed, but that does NOT extend to the
+// individual pet artwork submitted by gallery users.
 //
 // Each spritesheet is a fixed grid per petdex's spec: 8 columns x 9 rows
 // (1536x1872) or a "v2" 8 columns x 11 rows (1536x2288) for pets re-exported
@@ -22,7 +22,7 @@ export interface Creature {
   slug: string;
   /** Real display name from the petdex gallery (for attribution, not shown as the pet's in-game name). */
   displayName: string;
-  /** Gallery submitter, shown in the footer credits. */
+  /** Gallery submitter, credited in this file's creature table. */
   author: string;
   /**
    * Number of REAL (non-transparent) frames in this pet's idle row, out of

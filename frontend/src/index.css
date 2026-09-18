@@ -2,7 +2,7 @@
    TreatPaws landing page — app-specific layout & theme.
    animal-island-ui's own stylesheet (imported in main.tsx) already defines
    every `--animal-*` custom property used below; this file only adds page
-   layout, section spacing, and a few bespoke elements (ticker, pixel pets,
+   layout, section spacing, and a few bespoke elements (pixel pets,
    day slider) that have no ready-made library component. Fallback values
    after each `var(--animal-*, fallback)` keep the cozy cream/caramel/mint
    palette intact even if a token name differs across library versions.
@@ -94,8 +94,27 @@ body {
   gap: 12px;
 }
 
+.site-header__devnet-wrap {
+  display: inline-flex;
+  cursor: pointer;
+  border-radius: 50px;
+  transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.site-header__devnet-wrap:hover {
+  transform: translateY(-3px) scale(1.08);
+}
+
+.site-header__devnet-wrap:active {
+  transform: translateY(0) scale(0.96);
+}
+
 .site-header__devnet-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   white-space: nowrap;
+  cursor: pointer;
 }
 
 .site-header__balance {
@@ -265,59 +284,10 @@ body {
   .pet-sprite__frame {
     animation: none;
   }
-}
 
-/* -------------------------------------------------------------------------
-   Live activity ticker
-   ------------------------------------------------------------------------- */
-
-.ticker {
-  width: 100%;
-  overflow: hidden;
-  background: var(--animal-primary-color-bg, #e6f9f6);
-  border-top: 1.5px dashed var(--animal-border-color, #cfe9c9);
-  border-bottom: 1.5px dashed var(--animal-border-color, #cfe9c9);
-  padding: 12px 0;
-}
-
-.ticker__track {
-  display: flex;
-  gap: 40px;
-  width: max-content;
-  animation: ticker-scroll 32s linear infinite;
-}
-
-.ticker__item {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-weight: 600;
-  font-size: 14px;
-  color: var(--animal-text-color, #725d42);
-  white-space: nowrap;
-}
-
-.ticker__icon {
-  color: var(--animal-primary-color, #19c8b9);
-  flex-shrink: 0;
-}
-
-@keyframes ticker-scroll {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-50%);
-  }
-}
-
-.ticker:hover .ticker__track {
-  animation-play-state: paused;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .ticker__track {
-    animation: none;
+  .site-header__devnet-wrap:hover,
+  .site-header__devnet-wrap:active {
+    transform: none;
   }
 }
 
@@ -346,6 +316,30 @@ body {
   font-weight: 800;
   font-size: 20px;
   margin: 0 0 4px;
+}
+
+.vault-stats__skeleton {
+  display: flex;
+  justify-content: center;
+  margin: 0 auto 4px;
+  max-width: 160px;
+  animation: vault-stats-pulse 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes vault-stats-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vault-stats__skeleton {
+    animation: none;
+  }
 }
 
 .vault-stats__label {
@@ -714,19 +708,63 @@ body {
   opacity: 0.5;
 }
 
-.site-footer__credits {
+.site-footer__tagline {
   max-width: 640px;
   margin: 4px 0 0;
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.6;
-  font-weight: 500;
+  font-weight: 600;
   text-align: center;
-  opacity: 0.75;
+  color: var(--animal-text-color, #725d42);
+  opacity: 0.8;
 }
 
-.site-footer__credits a {
+/* -------------------------------------------------------------------------
+   Explorer verification modal
+   ------------------------------------------------------------------------- */
+
+.explorer-modal__body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.explorer-modal__copy {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.65;
   color: var(--animal-text-color, #725d42);
-  text-decoration: underline;
+}
+
+.explorer-modal__target {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.explorer-modal__notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 18px;
+  text-align: left;
+}
+
+.explorer-modal__notice-icon {
+  flex-shrink: 0;
+  color: var(--animal-warning-color, #e59266);
+  margin-top: 2px;
+}
+
+.explorer-modal__notice-text {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.6;
+  color: var(--animal-text-color, #725d42);
 }
 
 /* -------------------------------------------------------------------------
@@ -1474,6 +1512,68 @@ body {
   .takeover-modal__sprite-wrap {
     animation: none;
   }
+}
+
+/* -------------------------------------------------------------------------
+   Devnet community preview modal
+   ------------------------------------------------------------------------- */
+
+.devnet-modal__title {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.devnet-modal__title-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  color: var(--animal-success-color, #6fba2c);
+  background: var(--animal-success-color-bg, #eaf6dc);
+}
+
+.devnet-modal__body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.devnet-modal__copy {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.65;
+  color: var(--animal-text-color, #725d42);
+}
+
+.devnet-modal__roadmap {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 18px;
+  text-align: left;
+}
+
+.devnet-modal__roadmap-icon {
+  flex-shrink: 0;
+  color: var(--animal-warning-color, #e59266);
+  margin-top: 2px;
+}
+
+.devnet-modal__roadmap-text {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.6;
+  color: var(--animal-text-color, #725d42);
+}
+
+.devnet-modal__faucet-link {
+  text-decoration: none;
 }
 
 /* =========================================================================
