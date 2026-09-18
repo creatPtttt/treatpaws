@@ -192,7 +192,7 @@ per-button loading spinner (`<Button loading>`) and a success/error toast (the
 | Section | File | Notes |
 | --- | --- | --- |
 | Header / Navbar | `src/components/layout/SiteHeader.tsx` | Route-aware: full anchor nav + "Enter TreatPaws" CTA on `/`; collapses to a "Home" link elsewhere. Logo, clickable Devnet pill (opens `DevnetPreviewModal`), wallet connect + balance always visible. |
-| Hero | `src/components/sections/HeroSection.tsx` | Headline, subtitle, "playpen" `<Card>` with 4 real animated genesis pets idling, two CTAs. |
+| Hero | `src/components/sections/HeroSection.tsx` | Headline, subtitle, "playpen" `<Card>` with 4 real animated genesis pets idling, three CTAs (Adopt, Trainer Manual, `$TREAT` → Pump.fun). |
 | Global Treat Vault stats | `src/components/sections/VaultStats.tsx` | 4 `<Card>`s: live vault reserve (2-minute sessionStorage cache), pet count, base production rate, contract network. |
 | How It Works | `src/components/sections/HowItWorks.tsx` | 3-step `<Card>` explainer (Adopt or Snatch, Bake & Snack, Takeover Profit). |
 | Genesis Pets showcase | `src/components/sections/PetsShowcase.tsx` | 5×2 grid of live on-chain pets (name, price, owner) with a 2-minute sessionStorage cache. Buttons still route into `/playpen` via `useEnterGame`. |

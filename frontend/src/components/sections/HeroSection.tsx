@@ -1,6 +1,7 @@
 import { Card, Button } from 'animal-island-ui';
 import { PetSprite } from '../ui/PetSprite';
 import { getCreature } from '../../data/creatures';
+import { PUMP_FUN_URL } from '../../data/links';
 import { useEnterGame } from '../../hooks/useEnterGame';
 
 // A representative sample of 4 of the 10 real genesis pets (see
@@ -10,7 +11,7 @@ const PREVIEW_PET_IDS = [1, 6, 9, 10];
 /**
  * Above-the-fold hero: headline + subtitle on the left, an animal-island-ui
  * <Card> "playpen" showing a few of the real animated genesis companion
- * pets idling, plus the two primary call-to-action buttons.
+ * pets idling, plus the primary call-to-action buttons.
  */
 export function HeroSection() {
   // Same connect-then-navigate flow as the header's "Enter TreatPaws" CTA.
@@ -30,6 +31,9 @@ export function HeroSection() {
           </Button>
           <a href="#how-it-works">
             <Button size="large">Trainer Manual</Button>
+          </a>
+          <a href={PUMP_FUN_URL} target="_blank" rel="noopener noreferrer">
+            <Button size="large">$TREAT</Button>
           </a>
         </div>
       </div>
